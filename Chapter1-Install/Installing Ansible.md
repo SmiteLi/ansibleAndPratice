@@ -314,6 +314,7 @@ Global completion requires bash 4.2.
 
 ```
 $ sudo activate-global-python-argcomplete
+bash --version
 ```
 
 This will write a bash completion file to a global location. Use `--dest` to change the location.
