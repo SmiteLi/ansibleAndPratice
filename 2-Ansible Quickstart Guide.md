@@ -1,3 +1,5 @@
+# Ansible Quickstart Guide
+
 Are you a typical system administrator with too much work and not enough time? Does the prospect of making a simple DNS server change or adjusting kernel parameters across your entire server farm make you cringe? Or worse, making changes based on variable system characteristics such as installed memory or release version? Are the developers in your organization speaking another language to you with this whole [DevOps](https://www.redhat.com/en/topics/devops) thing?  
 
 [Red Hat Ansible Automation](https://www.redhat.com/en/technologies/management/ansible) is an agentless human readable automation tool that uses SSH to orchestrate configuration management, application deployment, and provisioning in a flat or multi-tier environment. It is based on the open source Ansible technology, which has become one of the world’s most popular open source [IT automation](https://www.redhat.com/en/topics/automation) technologies.
