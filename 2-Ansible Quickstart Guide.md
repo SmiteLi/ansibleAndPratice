@@ -1,50 +1,120 @@
-# Ansible Quickstart Guide
+# Ansible快速入门指导
 
-Are you a typical system administrator with too much work and not enough time? Does the prospect of making a simple DNS server change or adjusting kernel parameters across your entire server farm make you cringe? Or worse, making changes based on variable system characteristics such as installed memory or release version? Are the developers in your organization speaking another language to you with this whole [DevOps](https://www.redhat.com/en/topics/devops) thing?  
+## 一、基础概念
 
-[Red Hat Ansible Automation](https://www.redhat.com/en/technologies/management/ansible) is an agentless human readable automation tool that uses SSH to orchestrate configuration management, application deployment, and provisioning in a flat or multi-tier environment. It is based on the open source Ansible technology, which has become one of the world’s most popular open source [IT automation](https://www.redhat.com/en/topics/automation) technologies.
+1. 如何快速学习一门技术？
 
-This blog post will help you understand the basics of Ansible and how it can be used in your role as a system administrator to more efficiently manage your systems.
+对于计算机科学与技术，虽然只有八个字，却是无数前人累积的知识构建的庞大体系。对于现代的我们，不可能从二进制慢慢到汇编到高级编程语言这样学习，那得花上数年甚至数十年的时间。学习任何一门IT技术，最好的思路是：
 
-Before getting started, we need to define some terminology:
+- 这门技术是什么？
+- 手把手实践这么技术
+- 这么技术为什么会这样子设计？
+
+现在，我们准备学习ansible，让我们遵循What，practice，why（WPW）的学习思路，先把ansible的概念过一遍，实践一遍，然后从入门到实践系统学习这门技术。
+
+2. Ansible是什么？
+
+Ansible是一款无代理的自动化工具，通俗来说，就是使用SSH协议连接到各个服务器，然后执行各种预先编排的任务，以此达到从一个点（服务器）出发，三百六十度无死角般管理数十上百甚至更多的服务器。本教程简化介绍Ansible的基础知识，以及一个系统管理员如何使用Ansible工具更高效地管理系统。
+
+在开始之前，我们知道Ansible中一些常用的术语：
 
 **Control node:** the host on which you use Ansible to execute tasks on the managed nodes
 
+控制节点：安装了Ansible的主机，用来管理其他服务器（被管理节点）
+
 **Managed node:** a host that is configured by the control node
+
+被管理节点：一台主机，收到控制节点的管理
 
 **Host inventory:** a list of managed nodes
 
-**Ad-hoc command:** a simple one-off task
+：定义了被管理的主机是哪些，通常是填写hostname或者使用IP
 
-**Playbook:** a set of repeatable tasks for more complex configurations
+**Ad-hoc command:** 一次执行一条命令
 
-**Module:** code that performs a particular common task such as adding a user, installing a package, etc.
+**Playbook:** 用于复杂管理的可重复执行任务
 
-**Idempotency:** an operation is idempotent if the result of performing it once is exactly the same as the result of performing it repeatedly without any intervening actions
+**Module:** 模块，用于实现各种功能，例如user模块，用于对Linux系统的用户管理。
 
-### Environment
+**Idempotency:** 幂等性，不管执行多少次，最后的结果达到我们的预期。
 
-The environment in this post consists of one control node (vm1) and four managed nodes (vm2, vm3, vm4, vm5) all running in a virtual environment with a minimal Red Hat Enterprise Linux 7.4 installation. For sake of simplicity, the control node has the following entries in the /etc/hosts file:
+# Ansible concepts
+
+These concepts are common to all uses of Ansible. You need to understand them to use Ansible for any kind of automation. This basic introduction provides the background you need to follow the rest of the User Guide.
+
+- [Control node](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#control-node)
+- [Managed nodes](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#managed-nodes)
+- [Inventory](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#inventory)
+- [Modules](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#modules)
+- [Tasks](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#tasks)
+- [Playbooks](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#playbooks)
+
+## [Control node](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#id1)
+
+Any machine with Ansible installed. You can run commands and playbooks, invoking `/usr/bin/ansible` or `/usr/bin/ansible-playbook`, from any control node. You can use any computer that has Python installed on it as a control node - laptops, shared desktops, and servers can all run Ansible. However, you cannot use a Windows machine as a control node. You can have multiple control nodes.
+
+任何装有Ansible的机器。 您可以从任何控制节点运行命令和剧本，并调用/ usr / bin / ansible或/ usr / bin / ansible-playbook。 您可以将任何安装了Python的计算机用作控制节点-笔记本电脑，共享台式机和服务器都可以运行Ansible。 但是，不能将Windows计算机用作控制节点。 您可以有多个控制节点
+
+## [Managed nodes](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#id2)
+
+The network devices (and/or servers) you manage with Ansible. Managed nodes are also sometimes called “hosts”. Ansible is not installed on managed nodes.
+
+您使用Ansible管理的网络设备（和/或服务器）。 受管节点有时也称为“主机”。 未在受管节点上安装Ansible
+
+## [Inventory](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#id3)
+
+A list of managed nodes. An inventory file is also sometimes called a “hostfile”. Your inventory can specify information like IP address for each managed node. An inventory can also organize managed nodes, creating and nesting groups for easier scaling. To learn more about inventory, see [the Working with Inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#intro-inventory) section.
+
+受管节点的列表。 清单文件有时也称为“主机文件”。 您的清单可以为每个受管节点指定诸如IP地址之类的信息。 库存还可以组织受管节点，创建和嵌套组以便于扩展。 要了解有关库存的更多信息，请参见使用库存部分。
+
+## [Modules](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#id4)
+
+The units of code Ansible executes. Each module has a particular use, from administering users on a specific type of database to managing VLAN interfaces on a specific type of network device. You can invoke a single module with a task, or invoke several different modules in a playbook. For an idea of how many modules Ansible includes, take a look at the [list of all modules](https://docs.ansible.com/ansible/latest/modules/modules_by_category.html#modules-by-category).
+
+将执行代码单元Ansible。 从管理特定类型的数据库上的用户到管理特定类型的网络设备上的VLAN接口，每个模块都有特定的用途。 您可以通过任务调用单个模块，也可以在剧本中调用多个不同的模块。 要了解Ansible包含多少个模块，请查看所有模块的列表
+
+## [Tasks](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#id5)
+
+The units of action in Ansible. You can execute a single task once with an ad-hoc command.
+
+Ansible中的行动单位。 您可以使用临时命令一次执行一个任务
+
+## [Playbooks](https://docs.ansible.com/ansible/latest/user_guide/basic_concepts.html#id6)
+
+Ordered lists of tasks, saved so you can run those tasks in that order repeatedly. Playbooks can include variables as well as tasks. Playbooks are written in YAML and are easy to read, write, share and understand. To learn more about playbooks, see [About Playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks_intro.html#about-playbooks).
+
+已保存任务的有序列表，以便您可以按该顺序重复运行那些任务。 剧本可以包括变量以及任务。 剧本采用YAML编写，易于阅读，编写，共享和理解。 要了解有关剧本的更多信息，请参阅关于剧本
+
+## 二、实验环境
+
+搭建实验环境：一个控制节点，两个被管理节点。
+
+控制节点的/etc/hosts如下：
 
 ```
 192.168.102.211 vm1 vm1.redhat.lab
 192.168.102.212 vm2 vm2.redhat.lab
 192.168.102.213 vm3 vm3.redhat.lab
-192.168.102.214 vm4 vm4.redhat.lab
-192.168.102.215 vm5 vm5.redhat.lab
 ```
 
-For ease of use I'm going to give my system user passwordless sudo in this demonstration, your security policy may vary, and Ansible can handle a wide variety of privilege escalation use-cases. This user account has been configured for privilege escalation via the following entry in the /etc/sudoers file:
+为了简化使用，在服务器设置执行sudo命令不需要密码：
+
+`visudo`然后设置如下：
 
 ```
 %wheel ALL=(ALL) NOPASSWD: ALL
 ```
 
-This is only an example and you may wish to use your own sudo configuration variant.  
+也可以直接修改/etc/sudoers文件，效果一样的。
 
-Finally, SSH public key authentication has been configured and tested for this user account from the control node to each of the managed nodes.
+接着配置该用户ssh免密登录管理节点：
 
-## Installation
+1. 在控制节点执行：`ssh-keygen -b 2048 -t rsa -q -N "" -f ~/.ssh/id_rsa`
+2. 把控制节点公钥发送到被管理节点去：
+
+` ssh-copy-id 192.168.1.1`
+
+## 三、安装ansible
 
 Ansible for Red Hat Enterprise Linux 7 is located in the [Extras channel](https://access.redhat.com/solutions/912213). If you’re using Red Hat Enterprise Linux 6, enable the [EPEL](http://fedoraproject.org/wiki/EPEL) repository. For Extra Packages for Enterprise Linux (EPEL), this [solution](https://access.redhat.com/solutions/3358) in the customer portal may also be helpful. On Fedora systems you will find Ansible in the base repository.
 
@@ -68,17 +138,13 @@ ansible 2.4.1.0
 
 Note the default configuration file, and that python is required and present in our minimal Red Hat Enterprise Linux 7.4 installation.
 
-## Configuration
+## 四、配置ansible
 
-Since we have already configured the managed nodes with a user account, privilege escalation, and SSH public key authentication, we will continue by configuring the control node.
+### 决定ansible行为的ansible.cfg配置文件
 
-The configuration of the control node consists of both an Ansible configuration file and a host inventory file.
+默认配置文件是/etc/ansible/ansible.cfg，全局配置，对服务器上所有使用ansible的用户生效。ansible使用ansible.cfg的顺序如下，一旦发现了配置，直接使用，就不再搜索下层的文件。
 
-### Configuration file
-
-As we have just discovered, the default configuration file is /etc/ansible/ansible.cfg
-
-You can modify this global configuration file or make a copy specific to a particular directory. The order in which a configuration file is located is as follows:
+优先级如下：
 
 - ```
   ANSIBLE_CONFIG (environment variable)
@@ -96,7 +162,7 @@ You can modify this global configuration file or make a copy specific to a parti
   /etc/ansible/ansible.cfg (global)
   ```
 
-In this post, I will be using a minimal configuration file in the home directory of the user account added previously:
+本次我们的ansible.cfg配置如下：指定了hosts文件。
 
 ```
 [curtis@vm1 ~]$ cat ansible.cfg
@@ -104,11 +170,9 @@ In this post, I will be using a minimal configuration file in the home directory
 inventory = $HOME/hosts
 ```
 
-### Host inventory
+### Host inventory：主机清单
 
-The default host inventory file is /etc/ansible/hosts but can be changed via the configuration file (as shown above) or by using the -i option on the ansible command. We will be using a simple static inventory file. Dynamic inventories are also possible, but outside the scope of this post.
-
-Our host inventory file is as follows:
+默认的主机清单文件是/etc/ansible/hosts。不过本次我们通过ansible.cfg配置了主机清单文件为$HOME/hosts。我们的hosts文件如下：
 
 ```
 [webservers]
@@ -126,9 +190,9 @@ webservers
 dbservers
 ```
 
-We have defined four groups: webservers on vm2 and vm3, dbservers on vm4, logservers on vm5 and lamp which consists of the webservers and dbservers groups.
+这里我们定义了四个组: vm2和vm3属于webservers组；vm4属于dbservers组,，vm5属于logservers组，webservers组和dbservers 组构成了更大的组：lamp组。
 
-Let’s confirm that all hosts can be located using this configuration file:
+查看配置的所有主机:
 
 ```
 [curtis@vm1 ~]$ ansible all --list-hosts
@@ -139,7 +203,7 @@ Let’s confirm that all hosts can be located using this configuration file:
    vm4
 ```
 
-Similarly for individual groups, such as the webservers group:
+查看webservers组包含的主机:
 
 ```
 [curtis@vm1 ~]$ ansible webservers --list-hosts
@@ -148,7 +212,7 @@ Similarly for individual groups, such as the webservers group:
    vm3
 ```
 
-Now that we have validated our host inventory, let’s do a quick check to make sure all our hosts are up and running. We will do this using an ad-hoc command that uses the ping module:
+使用ansible ping所有主机:
 
 ```
 [curtis@vm1 ~]$ ansible all -m ping
@@ -174,51 +238,24 @@ vm2 | SUCCESS => {
 }
 ```
 
-We can see from the above output that all systems returned a successful result, nothing changed, and the result of each "ping" was "pong".
+从截图可以看到SUCCESS了, 每一台主机都返回了"pong"的结果。.
 
-You can obtain a list of available modules using:
+查看可用的module:
 
 ```
 [curtis@vm1 ~]$ ansible-doc -l
 ```
 
-The number of built-in modules continues to grow with each Ansible release:
+查看有多少module:
 
 ```
 [curtis@vm1 ~]$ ansible-doc -l | wc -l
 1378
 ```
 
-Documentation for each module can be found at http://docs.ansible.com/ansible/latest/modules_by_category.html
+## Ansible初体验
 
-The final setup task in our environment is to configure vm1 with Apache and a Red Hat Enterprise Linux 7 yum repository in order for the managed nodes to install additional packages:
-
-```
-[root@vm1 ~]# yum install -y httpd
-[root@vm1 ~]# systemctl enable httpd
-[root@vm1 ~]# systemctl start httpd
-[root@vm1 ~]# mkdir /media/iso
-[root@vm1 ~]# mount -o loop /root/rhel-server-7.4-x86_64-dvd.iso /media/iso
-[root@vm1 ~]# ln -s /media/iso /var/www/html/rhel7
-```
-
-## Ready, set, Ansible!
-
-Now that we have our environment configured and ready to go, let’s do some real work with Ansible.
-
-Since the managed nodes will need to have some additional packages installed, our first task is to configure a yum repository on each host using this configuration file:
-
-```
-[curtis@vm1 ~]$ cat dvd.repo
-[RHEL7]
-name = RHEL 7
-baseurl = http://vm1/rhel7/
-gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-enabled = 1
-gpgcheck = 1
-```
-
-We can copy this file to each of the managed nodes using an ad-hoc command with the copy module using the -m option and specify the required arguments using the -a option as follows:
+设置好ansible后，下面用ansible来进行一下实际的工作：
 
 ```
 [curtis@vm1 ~]$ ansible all -m copy -a 'src=dvd.repo dest=/etc/yum.repos.d owner=root group=root mode=0644' -b
@@ -242,50 +279,30 @@ vm5 | SUCCESS => {
 [...]
 ```
 
-Additional output from the remaining hosts has been removed for sake of brevity.
+- -m指定使用的module
+- -a 指定该模块的参数
 
-A few items are worth noting at this point:
+上面例子，把hello文件copy到vm1中，设置属于root用户，root用户组，文件权限是0644。
 
-1. Each node reports SUCCESS and "changed" : true meaning the module execution was successful and the file was created/changed. If we run the command again, the output will include "changed" : false meaning the file is already present and configured as required. In other words, Ansible will only make the required changes if they do not already exist. This is what is known as "idempotence".
-2. The -b option (see http://docs.ansible.com/ansible/latest/become.html) causes the remote task to use privilege escalation (i.e. sudo) which is required to copy files into the /etc/yum.repos.d directory
-3. You can find out what arguments the copy module requires using:
+-b选项表明使用权限提升，如使用sudo，这样我们就不会遇到因为权限不足导致执行失败。
+
+查看copy模块的用法：
 
 ```
 [curtis@vm1 ~]$ ansible-doc copy
 ```
 
-##  
-
 ## Playbooks
 
-While ad-hoc commands are useful for testing and simple one-off tasks, playbooks can be used to capture a set of repeatable tasks to run in the future. A playbook contains one or more plays which define a set of hosts to configure and a list of tasks to be performed.
+上面的命令，一次只能完成一项task（任务）。但需要多次操作时，就需要多次执行。当把这些task编排到一个文件里时，就成了ansible中的playbook（剧本）。
 
-In our scenario, we need to configure web servers, database servers, and a centralized logging server. The specific requirements are:
-
-1. The httpd package is installed on the web servers, enabled, and started
-2. Each web server has a default page with text "Welcome to <hostname> on <ip address>"
-3. Each web server has a user account with suitable access for content management
-4. The MariaDB package is installed on the database servers, enabled, and started
-5. The log server host is configured to accept remote logging messages
-6. Hosts in the webservers and dbservers groups send a copy of log messages to the log server host
-
- 
-
-The following playbook (myplaybook.yml) will configure everything we need.
-
-As you review the playbook, please note the following:
-
-1. The user module requires a hash of the plaintext password (see "ansible-doc user" for details).  This can be achieved as follows
-
-   - ```
-     [curtis@vm1 ~]$ python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())" Password: $6$rounds=656000$bp7zTIl.nar2WQPS$U5CBB15GHnzBqnhY0r7UX65FrBI6w/w9YcAL2kN9PpDaYQIDY6Bi.CAEL6PRRKUqe2bJYgsayyh9NOP1kUy4w.
-     ```
-
-2. The default web page content is created using "facts" gathered from the host. You can discover and use host facts using the setup module:
+ansible在运行时可以采集被管理主机的基本信息:
 
 ```
 [curtis@vm1 ~]$ ansible vm2 -m setup
-
+```
+部署nginx的playbook nginx.yml内容如下：
+```
 ---
 - hosts: webservers
  become: yes
@@ -396,15 +413,13 @@ As you review the playbook, please note the following:
        state: restarted
 ```
 
-### Running the playbook
-
-Our playbook can be run using:
+### 运行playbook
 
 ```
 [curtis@vm1 ~]$ ansible-playbook myplaybook.yml
 ```
 
-From the output below, we can see that the web server configuration occurs only on vm2 and vm3 (play 1) while the database is installed on vm4 (play 2) and the logserver (vm5) is configured with play 3. Finally, play 4 configures the webservers and dbservers hosts via the "lamp" group for remote logging.
+可以看到输出的结果如下：
 
 ```
 PLAY [webservers] *********************************************************************
@@ -491,9 +506,7 @@ vm4                        : ok=6 changed=4 unreachable=0    failed=0
 vm5                        : ok=4 changed=3 unreachable=0    failed=0 
 ```
 
-And you’re done!
-
-You can verify the webserver hosts using:
+验证部署是否成功：
 
 ```
 [curtis@vm1 ~]$ curl http://vm2
@@ -502,74 +515,36 @@ Welcome to vm2 on 192.168.102.212
 Welcome to vm3 on 192.168.102.213 
 ```
 
-and remote logging using the logger command on the webservers and dbservers hosts:
+查看nginx的access日志：
 
-```
-[curtis@vm1 ~]$ ansible lamp -m command -a 'logger hurray it works'
-vm3 | SUCCESS | rc=0 >>
 
-vm4 | SUCCESS | rc=0 >>
 
-vm2 | SUCCESS | rc=0 >>
-```
-
-Confirmation on the central logging server:
-
-```
-[curtis@vm1 ~]$ ansible logservers -m command -a "grep 'hurray it works$' /var/log/messages" -b
-vm5 | SUCCESS | rc=0 >>
-Jan 30 13:28:29 vm3 curtis: hurray it works
-Jan 30 13:28:29 vm2 curtis: hurray it works
-Jan 30 13:28:29 vm4 curtis: hurray it works
-```
-
-## Tips & tricks
-
-### If you’re new to YAML, the [syntax](http://docs.ansible.com/ansible/latest/YAMLSyntax.html) can be tricky at first, particularly with spacing (no tabs).
-
-Before running a playbook, you can check the syntax using:
+运行playbook前，检查playbook的yaml语法是否正确:
 
 ```
 $ ansible-playbook --syntax-check myplaybook.yml
 ```
 
-Using vim with syntax highlighting is helpful not only in learning yaml, but in finding syntax problems. A quick way to enable vim for yaml syntax is by adding the following line to your ~/.vimrc file:
-
- 
+在~/.vimrc文件加入下面的配置，对yaml语法进行高亮和检查：
 
 ```
 autocmd Filetype yaml setlocal tabstop=2 ai colorcolumn=1,3,5,7,9,80
 ```
 
-If you’d like something with a few more features, including color, one such plugin can be found [here](https://github.com/pearofducks/ansible-vim).
-If you prefer to use emacs instead of vim, enable the [EPEL](http://fedoraproject.org/wiki/EPEL) repository and install the emacs-yaml-mode package.
-
-### You can test a playbook without actually making any changes to the target hosts:
+测试对被管理节点产生哪些修改：
 
 ```
 $ ansible-playbook --check myplaybook.yml
 ```
 
-Stepping through a playbook may also be useful:
+单步执行playbook
 
 ```
 $ ansible-playbook --step myplaybook.yml
 ```
 
-### Similar to a shell script, you can make your Ansible playbook executable and add the following to the top of the file:
+类似shell脚本，可在playbook第一行加入如下配置：
 
 ```
 #!/bin/ansible-playbook
 ```
-
-### To execute arbitrary ad-hoc shell commands, use the command module (the default module if -m is not specified). If you need to use things like redirection, pipelines, etc., then use the shell module instead.
-
-### Speed up writing playbooks by checking the "EXAMPLES:" section in the documentation for a particular module.
-
-### Use string quoting in playbooks to avoid issues with special characters within a string.
-
-### Logging is disabled by default. To enable logging, use the log_path parameter in the Ansible configuration file.
-
-I hope this post has given you a better idea of how Ansible works and how it can save you both time and effort using playbooks to document and repeat mundane tasks with ease and accuracy. Be sure to continue learning at [http://docs.ansible.com](http://docs.ansible.com/) and https://www.redhat.com/en/technologies/management/ansible.
-
-Happy automating!

@@ -1,0 +1,134 @@
+# Ansible从入门到实战（1）-Ansible安装（离线）
+
+虽然是离线安装，但是必须有一台相同操作系统的机器可以连网，比如建了一台可以连网的虚拟机。
+
+本次教程基于Centos7，机器可以连网。
+
+## 一、安装 pip
+
+如果系统已经有了pip命令，直接到第二步。
+
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python get-pip.py
+
+用上面的方法安装pip时，会自动安装包setuptools和wheel。因为离线，所以服务器无法自动安装，
+不过我们可以在连网的机器先下载好对应的包：
+
+pip download setuptools
+pip download wheel
+
+把下载好的包上传到/local/copies，总共三个包，如下
+get-pip.py  
+setuptools-41.4.0-py2.py3-none-any.whl  
+wheel-0.33.6-py2.py3-none-any.whl
+
+然后离线安装：python get-pip.py --no-index --find-links=/local/copies
+
+如果不行，按照下面的步骤安装：
+python --no-setuptools --no-setuptools get-pip.py
+pip install setuptools-41.4.0-py2.py3-none-any.whl
+pip install wheel-0.33.6-py2.py3-none-any.whl
+
+## 二、用git拉取最新的ansible稳定版
+- git clone https://github.com/ansible/ansible.git
+
+- ansible依赖的python包：requirements.txt
+jinja2
+PyYAML
+cryptography
+
+- 下载ansible需要的python包
+
+pip download -r ansible/requirements.txt
+
+参考命令：
+pip download jinja2 ./pkg
+pip download PyYAML ./pkg
+pip download cryptography -d ~/pkg
+
+
+## 三、用git进行离线安装
+
+ansible包和依赖包上传到内网服务器 /local/copies
+
+然后安装：
+python get-pip.py --no-index --find-links=/tmp/ansible-offline-20191010
+pip install --no-index --find-links=/local/copies  -r requirements.txt
+
+
+- 安装ansible
+
+$ cd ./ansible
+$ source ./hacking/env-setup
+
+结果如下：
+export PATH=$PATH:/data/solution/ansible/ansible-2.8.5/bin
+export PYTHONPATH=/data/solution/ansible/ansible-2.8.5/lib
+export MANPATH=$MANPATH:/data/solution/ansible/ansible-2.8.5/docs/man
+
+- 配置root的.bashrc文件，在文件最后添加以下内容：
+
+```bash
+export PATH=$PATH:/data/solution/ansible/ansible-2.8.5/bin
+export PYTHONPATH=/data/solution/ansible/ansible-2.8.5/lib
+export MANPATH=$MANPATH:/data/solution/ansible/ansible-2.8.5/docs/man
+```
+
+source ~/.bashrc
+ansible --version
+
+```
+[root@host-172-16-102-29 ansible-2.8.5]# ansible --version
+ansible 2.8.5
+  config file = None
+  configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /data/solution/ansible/ansible-2.8.5/lib/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Jun 20 2019, 20:27:34) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+```
+
+## 四、用tarball安装ansible
+
+- 下载tarball：https://releases.ansible.com/ansible/ansible-latest.tar.gz
+
+- 解压下载好的ansible-latest.tar.gz 到 /data/solution/ansible 目录
+tar -xf ansible-latest.tar.gz -C /data/solution/ansible
+
+- 配置root的.bashrc文件，在文件最后添加以下内容：
+
+```bash
+export PATH=$PATH:/data/solution/ansible/ansible-2.8.5/bin
+export PYTHONPATH=/data/solution/ansible/ansible-2.8.5/lib
+export MANPATH=$MANPATH:/data/solution/ansible/ansible-2.8.5/docs/man
+```
+
+source ~/.bashrc
+ansible --version
+
+- 如果运行报错，请参考第一，第二小节安装好ansible需要的python包
+
+## 五、参考命令
+
+安装指定的离线包，参考命令：
+pip list
+pip show pkg_name
+pip install --user -r ./requirements.txt
+pip install --no-index --find-links=/root/pippkg jinja2 或
+pip install --no-index --find-links=/tmp/ansible-offline-20191010  -r requirements.txt
+pip install --download d:/python27/packages -r requirements.txt
+pip freeze >requirements.txt  把已安装的包列表输出到文件里
+
+https://pip.pypa.io/en/stable/installing/
+
+https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#tarballs-of-tagged-releases
+
+自己制作rpm包：
+$ git clone https://github.com/ansible/ansible.git
+$ cd ./ansible
+$ make rpm
+$ sudo rpm -Uvh ./rpm-build/ansible-*.noarch.rpm
+
+自己制作deb包：
+$ git clone https://github.com/ansible/ansible.git
+$ cd ./ansible
+$ make deb
