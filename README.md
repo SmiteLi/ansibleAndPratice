@@ -1,8 +1,12 @@
 # ansibleAndPratice
-from zero to infinity pratice ansible.
 
-1. the practice of vagrant
-2. the way learn ansible
+## 目录大纲
+
+1. ansible的安装、配置和入门
+2. ansible常用模块
+3. ansible的inventory
+4. ansible的命令行工具
+
 
 some data to download:
 1. vagrant:

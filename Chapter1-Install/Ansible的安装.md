@@ -82,7 +82,7 @@ $ ansible myhost --become -m raw -a“ yum install -y python2”
 
 Which Ansible version to install is based on your particular needs. You can choose any of the following ways to install Ansible:
 
-- Install the latest release with your OS package manager (for Red Hat Enterprise Linux (TM), CentOS, Fedora, Debian, or Ubuntu).
+- Install the latest release with yfour OS package manager (for Red Hat Enterprise Linux (TM), CentOS, Fedora, Debian, or Ubuntu).
 
 - Install with `pip` (the Python package manager).
 

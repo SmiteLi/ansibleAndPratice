@@ -1,9 +1,5 @@
 # Working with command line tools
 
-使用命令行工具
-
-Most users are familiar with ansible and ansible-playbook, but those are not the only utilities Ansible provides. Below is a complete list of Ansible utilities. Each page contains a description of the utility and a listing of supported parameters.
-
 ansible和ansible-playbook是我们接触最多命令，但这只是Ansible部分的功能而已。Ansible还有众多命令，下面我们一一介绍，并附上一些实践的例子，体会Ansible的强大。
 
 - [ansible](https://docs.ansible.com/ansible/latest/cli/ansible.html)
@@ -19,8 +15,6 @@ ansible和ansible-playbook是我们接触最多命令，但这只是Ansible部�
 
 
 ## ansible 命令
-
-**Define and run a single task ‘playbook’ against a set of hosts**
 
 ansible 命令用于对一组特定的主机运行单个任务，是用于执行“远程操作”的最简单命令。它有以下参数：
 
@@ -272,29 +266,13 @@ usage: ansible [-h] [--version] [-v] [-b] [--become-method BECOME_METHOD]
 
 ## [Environment](https://docs.ansible.com/ansible/latest/cli/ansible.html#id5)
 
-The following environment variables may be specified.
-
-[`ANSIBLE_CONFIG`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#envvar-ANSIBLE_CONFIG) – Override the default ansible config file
-
-Many more are available for most options in ansible.cfg
-
-可以指定以下环境变量。
-
-ANSIBLE_CONFIG –覆盖默认的ansible配置文件
-
 ansible.cfg中的大多数选项都可以使用更多功能
-
-## [Files](https://docs.ansible.com/ansible/latest/cli/ansible.html#id6)
-
-`/etc/ansible/ansible.cfg` – Config file, used if present
-
-`~/.ansible.cfg` – User config file, overrides the default config if present
 
 /etc/ansible/ansible.cfg –配置文件(如果存在)
 
 〜/ .ansible.cfg –用户配置文件，覆盖默认配置(如果存在)
 
-
+ANSIBLE_CONFIG –覆盖默认的ansible配置文件
 
 ## 命令使用实例：
 
