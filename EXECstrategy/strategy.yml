@@ -1,0 +1,64 @@
+---
+- name: test play
+  hosts: hometest
+  serial: 1
+  gather_facts: False
+
+  tasks:
+    - name: first task
+      command: echo first
+    - name: second task
+      command: hostname
+
+- name: test play
+  hosts: hometest
+  serial: "50"
+  gather_facts: False
+
+  tasks:
+    - name: first task
+      command: echo first
+    - name: second task
+      command: hostname
+
+- name: test play
+  hosts: hometest
+  serial:
+    - 1
+    - 2
+    - 3
+  gather_facts: False
+
+  tasks:
+    - name: first task
+      command: echo first
+    - name: second task
+      command: hostname
+
+- name: test play
+  hosts: hometest
+  serial:
+    - "10%"
+    - "20%"
+    - "70%"
+  gather_facts: False
+
+  tasks:
+    - name: first task
+      command: echo first
+    - name: second task
+      command: hostname
+
+- name: test play
+  hosts: hometest
+  serial:
+    - 1
+    - 3
+    - "70%"
+  gather_facts: False
+
+  tasks:
+    - name: first task
+      command: echo first
+    - name: second task
+      command: hostname

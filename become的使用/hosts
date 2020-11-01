@@ -1,0 +1,11 @@
+# 资料参考：https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+# [localhost]
+localhost ansible_connection=local
+
+[host1]
+192.168.71.128 ansible_connection=local
+
+[host2]
+192.168.71.129 ansible_user=long
+ansible2 ansible_connection=ssh ansible_host=192.168.71.129 ansible_user=apple ansible_password=apple
+# ansible_password=apple

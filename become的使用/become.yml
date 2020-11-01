@@ -1,0 +1,52 @@
+---
+
+- name: talk to all hosts just so we can learn about them
+  hosts: all
+  tasks:
+    # group_by 模块可以动态生成主机组，不需要再inventory文件里定义
+    - name: Classify hosts depending on their OS distribution
+      group_by:
+        key: os_{{ ansible_facts['distribution'] }}
+
+# now just on the CentOS hosts...
+- hosts: os_CentOS
+  gather_facts: False
+  tasks:
+    # tasks that only happen on CentOS go in this play
+    - name: debug the os
+      debug:
+        msg: "{{ ansible_facts['distribution'] }}"
+
+# now just on the Ubuntu hosts...
+- hosts: os_Ubuntu
+  gather_facts: False
+  tasks:
+    # tasks that only happen on Ubuntu go in this play
+    - name: debug the os
+      debug:
+        var: ansible_facts['distribution']
+    # - name: debug the os
+    #   debug:
+    #     var: ansible_facts
+
+- hosts: all
+  tasks:
+    - name: Set OS distribution dependent variables
+      include_vars: "os_{{ ansible_facts['distribution'] }}.yml"
+    - debug:
+        var: asdf
+
+- hosts: host2
+  tasks:
+    - name: debug
+      debug:
+        msg: "{{one}} {{two}} {{three}}"
+    # - name: ensure docker is running
+    #   service:
+    #     name: docker
+    #     state: started
+    #   become: yes
+    - name: Run a command as the apache user
+      shell: sudo docker version
+      become: yes
+      become_user: long

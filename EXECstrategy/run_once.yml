@@ -1,0 +1,13 @@
+---
+# If you want a task to run only on the first host in your batch of hosts, set run_once to true on that task:
+- hosts: hometest
+  gather_facts: False
+  tasks:
+    - name:  ansible_host is the host exec the task
+      shell: echo hostname
+      run_once: True
+    - name:  ansible_host is the host exec the task
+      shell: echo two
+    - name: the same
+      command: ehco when clause
+      when: inventory_hostname == hometest[0]

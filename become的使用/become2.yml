@@ -1,0 +1,19 @@
+---
+
+- hosts: host2
+  become: yes
+  become_user: root
+  become_method: su
+  tasks:
+    - name: debug
+      debug:
+        msg: "{{one}} {{two}} {{three}}"
+    # - name: ensure docker is running
+    #   service:
+    #     name: docker
+    #     state: started
+    #   become: yes
+    - name: ls /root
+      shell: ls /root
+
+      

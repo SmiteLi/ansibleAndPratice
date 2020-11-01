@@ -1,0 +1,8 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name:  ansible_host is the host exec the task
+      debug:
+        var:  ansible_host
+      throttle: 1
