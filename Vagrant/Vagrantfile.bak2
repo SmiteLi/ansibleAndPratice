@@ -9,6 +9,33 @@ Vagrant.configure("2") do |config|
     admin.vm.network "private_network", ip: "172.17.177.11"
     admin.vm.provision "file", source: "ansible.cfg", destination: "~/.ansible.cfg"
     admin.vm.provision :shell, path: "bootstrap.sh"
+
+    admin.vm.provision :ansible_local do |ansible|
+      ansible.playbook       = "provisioning/playbook.yml"
+      ansible.limit          = "all" # or only "nodes" group, etc.
+      ansible.inventory_path = "inventory"
+
+      ansible.host_vars = {
+        "node1" => {"http_port" => 80,
+                    "maxRequestsPerChild" => 808},
+        "node2" => {"http_port" => 303,
+                    "maxRequestsPerChild" => 909},
+        "node3" => {"http_port" => 303,
+                    "maxRequestsPerChild" => 909}
+      }
+
+      # https://www.vagrantup.com/docs/provisioning/ansible_intro
+      ansible.groups = {
+        "group1" => ["node1"],
+        "group2" => ["node2"],
+        "group3" => ["node[1:2]"],
+        "group4" => ["other_node-[a:d]"], # silly group definition
+        "all_groups:children" => ["group[1:9]"],
+        "group1:vars" => {"variable1" => 9,
+                          "variable2" => "example"}
+    }
+
+    end
   end
 
   config.vm.define "node1" do |node|

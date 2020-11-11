@@ -1,0 +1,34 @@
+---
+- name: test condition
+  hosts: localhost
+  serial: 1
+  gather_facts: False
+  vars:
+    epic: true
+    monumental: "yes"
+  roles:
+     - role: debian_stock_config
+       when: ansible_facts['os_family'] == 'Debian'
+
+  tasks:
+    - name: show facts available on the system
+      debug:
+        var: ansible_facts
+
+    # all tasks within an imported file inherit the condition from the import statement
+    # main.yml
+    - import_tasks: other_tasks.yml # note "import"
+      when: x is not defined
+
+    - name: Set a variable if not defined
+      set_fact:
+        x: foo
+      when: x is not defined
+      # this task sets a value for x
+
+    - name: Do the task if "x" is not defined
+      debug:
+        var: x
+      when: x is not defined
+      # Ansible skips this task, because x is now defined
+

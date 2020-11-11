@@ -1,0 +1,96 @@
+---
+- name: test condition
+  hosts: localhost
+  serial: 1
+  gather_facts: False
+  vars:
+    epic: true
+    monumental: "yes"
+
+  tasks:
+    - name: show facts available on the system
+      debug:
+        var: ansible_facts
+
+    - name: Run the command if "epic" or "monumental" is true
+      shell: echo "This certainly is epic!"
+      when: epic or monumental | bool
+
+    - name: Run the command if "epic" is false
+      shell: echo "This certainly isn't epic!"
+      when: not epic
+      
+    - name: Run the command if "foo" is defined
+      shell: echo "I've got '{{ foo }}' and am not afraid to use it!"
+      when: foo is defined
+
+    - name: Fail if "bar" is undefined
+      fail: msg="Bailing out. This play requires 'bar'"
+      when: bar is undefined
+      
+    - name: Register a variable
+      shell: cat /etc/motd
+      register: motd_contents
+
+    - name: Use the variable in conditional statement
+      shell: echo "motd contains the word hi"
+      when: motd_contents.stdout.find('hi') != -1 # -1 means not find, 
+
+    - name: Register a variable, ignore errors and continue
+      command: /bin/false
+      register: result
+      ignore_errors: true
+  
+    - name: Run only if the task that registered the "result" variable fails
+      command: /bin/ls /tmp
+      when: result is failed
+
+    - name: result is ?
+      debug:
+        var: result
+  
+    - name: Run only if the task that registered the "result" variable succeeds
+      command: /bin/ls
+      when: result is succeeded
+  
+    - name: Run only if the task that registered the "result" variable is skipped
+      command: /bin/ls
+      when: result is skipped
+
+- name: Registered variable usage as a loop list
+  hosts: corptest
+  tasks:
+
+    - name: Retrieve the list of home directories
+      command: ls /home
+      register: home_dirs
+
+    - name: debug the home_dirs
+      debug:
+        var: home_dirs
+
+    - name: debug the stdout_lines
+      debug:
+        var: home_dirs.stdout_lines
+
+    # - name: Add home dirs to the backup spooler
+    #   file:
+    #     path: /mnt/bkspool/{{ item }}
+    #     src: /home/{{ item }}
+    #     state: link
+    #   loop: "{{ home_dirs.stdout_lines }}"
+      # same as loop: "{{ home_dirs.stdout.split() }}"
+
+- name: check registered variable for emptiness
+  hosts: corptest
+
+  tasks:
+
+      - name: List contents of directory
+        command: ls /tmp
+        register: contents
+
+      - name: Check contents for emptiness
+        debug:
+          msg: "Directory is empty"
+        when: contents.stdout == ""

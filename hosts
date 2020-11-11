@@ -1,0 +1,7 @@
+controller ansible_connection=local
+node1      ansible_host=172.17.177.21 ansible_user=vagrant ansible_ssh_pass=vagrant
+node2      ansible_host=172.17.177.22 ansible_user=vagrant ansible_ssh_pass=vagrant
+node3      ansible_host=172.17.177.23 ansible_user=vagrant ansible_ssh_pass=vagrant
+
+[nodes]
+node[1:3]

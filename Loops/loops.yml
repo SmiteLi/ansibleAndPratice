@@ -1,0 +1,86 @@
+---
+- name: test loops
+  hosts: localhost
+  serial: 1
+  gather_facts: False
+  vars:
+    animal:
+      - cat
+      - dog
+      - tiger
+    student:
+      - tom
+      - jack
+      - lucy
+
+  tasks:
+    - name: Add several users
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: present
+        groups: "wheel"
+      loop:
+        - apple
+        - boy
+    - name: debug animal
+      debug:
+        var: animal
+    - name: loop animal
+      debug:
+        msg: "{{item}}"
+      loop: "{{animal}}"
+
+- name: use yum without loops
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+    - name: Download the nginx docker package but do not install it
+      yum:
+        name:
+          - nginx
+          - docker-ce
+        state: latest
+        download_only: true
+        download_dir: "/tmp/test"
+    - name: Add several users - Iterating over a list of hashes
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        state: present
+        groups: "{{ item.groups }}"
+      loop:
+        - { name: 'testuser1', groups: 'wheel' }
+        - { name: 'testuser2', groups: 'root' }
+    - name: Iterating over a dictionary - Using dict2items
+      ansible.builtin.debug:
+        msg: "{{ item.key }} - {{ item.value }}"
+      loop: "{{ tag_data | dict2items }}"
+      vars:
+        tag_data:
+          Environment: dev
+          Application: payment
+
+    - name: Register loop output as a variable
+      shell: "echo {{ item }}"
+      loop:
+        - "one"
+        - "two"
+      register: echo
+
+    - name: Fail if return code is not 0
+      ansible.builtin.fail:
+        msg: "The command ({{ item.cmd }}) did not have a 0 return code"
+      when: item.rc != 0
+      loop: "{{ echo.results }}"
+
+    - name: Retry a task until a certain condition is met
+      shell: "echo hello"
+      register: result
+      # until: result.stdout.find("all systems go") != -1
+      until: result.stdout.find("changed") == -1
+      # retries: 5
+      # delay: 10
+
+    - name: debug result
+      debug:
+        var: result

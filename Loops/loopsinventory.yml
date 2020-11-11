@@ -1,0 +1,55 @@
+---
+- name: test loops
+  hosts: corptest
+  serial: 1
+  gather_facts: False
+  vars:
+    animal:
+      - cat
+      - dog
+      - tiger
+    student:
+      - tom
+      - jack
+      - lucy
+
+  tasks:
+    - name: Show all the hosts in the inventory
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ groups['all'] }}"
+  
+    - name: Show all the hosts in the current play
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ ansible_play_batch }}"
+
+    - name: Show all the hosts in the inventory
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ query('inventory_hostnames', 'all') }}"
+    
+    - name: Show all the hosts matching the pattern, ie all but the group localhost
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ query('inventory_hostnames', 'all:!localhost') }}"
+      loop_control:
+        pause: 3
+
+    - name: Show all the hosts matching the pattern, ie all but the group localhost
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ lookup('inventory_hostnames', 'all', wantlist=True) }}"
+
+    - name: Create servers
+      debug:
+        var: item.name
+      loop:
+        - name: server1
+          disks: 3gb
+          ram: 15Gb
+          network:
+            nic01: 100Gb
+            nic02: 10Gb
+      loop_control:
+        label: "{{ item.name }}"

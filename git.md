@@ -1,1 +1,0 @@
-git push git@github.com:SmiteLi/ansibleAndPratice.git

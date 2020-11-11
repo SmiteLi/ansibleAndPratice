@@ -1,0 +1,15 @@
+{
+    "name": "hashicorp/bionic64",
+    "versions": 
+    [
+        {
+            "version": "1.0.282",
+            "providers": [
+                {
+                  "name": "virtualbox",
+                  "url": "./hashicorp-bionic64-virtualbox.box"
+                }
+            ]
+        }
+    ]
+}

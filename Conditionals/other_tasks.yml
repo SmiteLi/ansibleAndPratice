@@ -1,0 +1,8 @@
+# other_tasks.yml
+- name: Set a variable
+    set_fact:
+    x: foo
+
+- name: Print a variable
+    debug:
+    var: x

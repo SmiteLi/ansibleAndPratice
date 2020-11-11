@@ -1,0 +1,5 @@
+one: "{{vault_one}}"
+two: "{{vault_two}}"
+three: "{{vault_three}}"
+four: "{{vault_four}}"
+db_password: "{{ vault_db_password }}"

@@ -1,0 +1,38 @@
+---
+- name: test condition
+  hosts: localhost
+  serial: 1
+  gather_facts: True
+  vars:
+    animal:
+      - cat
+      - dog
+
+  tasks:
+    - name: show facts available on the system
+      debug:
+        var: ansible_facts
+      #   - ansible_facts
+      #   - ansible_facts['distribution']
+      #   - ansible_facts['distribution_major_version']
+      #   - ansible_facts['os_family']
+
+    - name: shutdown debian flavored systems
+      command: /sbin/shutdown -t now
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: shutdown centos 6 or debian 7
+      command: /sbin/shutdown -t now
+      when: (ansible_facts['distribution'] == 'Centos' and ansible_facts['distribution_major_version'] == '6') or
+        (ansible_facts['distribution'] == "Debian" and ansible_facts["distribution_major_version"] == "7")
+
+    - name: Shut down CentOS 6 systems
+      command: /sbin/shutdown -t now
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] == "6"
+    
+    # make string -> int
+    - shell: echo "only on Red Hat 6, derivatives, and later"
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['distribution_major_version'] | int >= 6
+      # when: ansible_facts['os_family'] == "RedHat" and ansible_facts['lsb']['major_release'] | int >= 6

@@ -1,0 +1,17 @@
+---
+- name: test condition
+  hosts: localhost
+  serial: 1
+  gather_facts: False
+  vars:
+    epic: true
+    monumental: "yes"
+  roles:
+    - role: debian_stock_config
+      when: ansible_facts['os_family'] == 'Debian'
+
+  tasks:
+    - name: show facts available on the system
+      debug:
+        var: ansible_facts
+
